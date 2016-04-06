@@ -1,0 +1,26 @@
+---
+title: "MPG Transmission"
+author: "Joohyun Kwon"
+date: "April 5, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#load mtcars data
+data(mtcars)
+str(mtcars)
+head(mtcars)
+tail(mtcars)
+boxplot(mpg ~ am, data=mtcars, main="Mileage by Transmission Type", ylab="MPG (Mile per Gallon)",
+        col=c("lightgreen","lightblue"), names=c("automaitc", "manual"))
+```
+from the boxplot, we can see cars with manual transmission have on average much higher mpg. Also, more than 75% of cars with manual transmission have higher mpg than 75% of cars with automaitc transmission. It is quite apparent. However, we will investigate how other factors such as displacement, number of cylinder and etc are influencing this.
+
+```{r}
+
+```
+
