@@ -55,3 +55,12 @@ summary(fitAll)
 library(car)
 vif(fitAll)
 ```
+
+```{r}
+fit_cyl_carb = lm(mpg ~ . - cyl - carb, data=mtcars)
+anova(fitAll,fit_cyl_carb)
+fit_l = lm(mpg ~ am + disp + hp +drat + wt + qsec +vs +gear, data=mtcars)
+vif(fit_l)
+fit_l_g = lm(mpg ~ am + disp + hp +drat + wt + qsec +vs, data=mtcars)
+anova(fit_l, fit_l_g)
+```
