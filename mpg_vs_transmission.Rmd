@@ -16,6 +16,7 @@ str(mtcars)
 head(mtcars)
 tail(mtcars)
 
+cor(mtcars)
 ```
 
 
@@ -39,6 +40,49 @@ summary(fit)
 ```
 
 ```{r}
+#create a vector with mtcars's column names - "am"
+x <- names(mtcars)
+x <- x[! x == "am" & ! x == "mpg" ]
+tt <- data.frame()
+x
+for (i in 1:length(x)) {
+    fml <- NULL; y <-NULL ; fit_temp <- NULL
+    fml <- paste("mpg ~ am + ", x[i] )
+    fit_temp <- lm(fml, data=mtcars) 
+    y <- c(fml,summary(fit_temp)$coefficients[2,1], summary(fit_temp)$coefficients[2,4] ); print(y)
+
+#    tt <- rbind(tt,y)
+}
+
+tt
+```
+
+```{r}
+fit1 = lm(mpg ~ am + cyl, data=mtcars)
+summary(fit1)
+anova(fit,fit1)
+
+fit2 = lm(mpg ~ am + disp, data=mtcars)
+summary(fit2)
+anova(fit,fit2)
+
+fit3 = lm(mpg ~ am + hp, data=mtcars)
+summary(fit3)
+anova(fit,fit3)
+
+fit4 = lm(mpg ~ am + hp + drat, data=mtcars)
+summary(fit4)
+anova(fit3,fit4)
+```
+
+```{r}
+fit5 = lm(mpg ~ am + hp + wt, data=mtcars)
+summary(fit5)
+anova(fit3,fit5)
+```
+
+
+```{r}
 pairs(mtcars, panel = panel.smooth, col = 3 + (mtcars$am == 1))
 ```
 
@@ -55,6 +99,8 @@ summary(fitAll)
 library(car)
 vif(fitAll)
 ```
+
+
 
 ```{r}
 fit_cyl_carb = lm(mpg ~ . - cyl - carb, data=mtcars)
