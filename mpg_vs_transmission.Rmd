@@ -14,30 +14,82 @@ We are interested in analyzing various factors that influence gas mileage (MPG -
 - Is an automatic or manual transmission better for MPG
 - What is MPG difference between those two transmission types
 
+A simple t-test shows that there is significant difference in average MPG between those two groups - one with automatic transmission, the other with manua. We also build a regression model with tranmission type and hp as regressors. This model shows that there is average 5.28 MPG increase in cars with manual transmission compared with those with automatic transmission.
 
+#Data Process
+We load data and briefly examine them.
 ```{r}
 #load mtcars data
 data(mtcars)
 str(mtcars)
 head(mtcars)
 tail(mtcars)
+```
+It appears that some columns appear to be categorical - am, cyl, vs, carb. We will later modify the type of those columns to factor from number.
 
-cor(mtcars)
+Let's make some columns to factor so that we can build model more easily.
+```{r}
+mtcars.f = mtcars
+mtcars.f$am = as.factor(mtcars.f$am)
+#chang level names to automaitc and manual
+levels(mtcars.f$am) = c("automatic", "manual")
+mtcars.f$cyl = as.factor(mtcars.f$cyl)
+mtcars.f$vs = as.factor(mtcars.f$vs)
+mtcars.f$gear = as.factor(mtcars.f$gear)
+mtcars.f$carb = as.factor(mtcars.f$carb)
+```
+Let's check correlation of variables.
+```{r}
+#cor_matrix <- cor(mtcars)
+#cor_matrix[c(1,9),]
+
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- abs(cor(x, y))
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+    if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+    text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+pairs(mtcars.f, lower.panel = panel.smooth, upper.panel = panel.cor,  col = 3 + (mtcars$am == 1))
 ```
 
+We can see mpg is correlated highly with cyl, disp, hp and wt but less with am. These correspond with our intutition that number of cylider, displacement of engine, HP and Weight will have high impact on MPG.
+
+However, cyl, wt and disp have strong colinearity with am. This will strongly affect the adjustment of linear model between mpg and am, when other variables are considered. We will look at this later and modify our model accordingly.
+
+#Eploratory Data Analysis
 
 ```{r}
-mtcars$am = as.factor(mtcars$am)
-mtcars$cyl = as.factor(mtcars$cyl)
-mtcars$vs = as.factor(mtcars$vs)
-mtcars$gear = as.factor(mtcars$gear)
-mtcars$carb = as.factor(mtcars$carb)
-str(mtcars)
 boxplot(mpg ~ am, data=mtcars, main="Mileage by Transmission Type", ylab="MPG (Mile per Gallon)",
         col=c("lightgreen","lightblue"), names=c("automaitc", "manual"))
 ```
 
+
+
 from the boxplot, we can see cars with manual transmission have on average much higher mpg. Also, more than 75% of cars with manual transmission have higher mpg than 75% of cars with automaitc transmission. It is quite apparent. However, we will investigate how other factors such as displacement, number of cylinder and etc are influencing this.
+
+##Hypothesis
+MPG of manual transmission is equal to that of automatic transmission
+```{r}
+mtcars <- mtcars.f
+mean_auto = mean(mtcars[mtcars$am=="automatic",]$mpg)
+mean_manual = mean(mtcars[mtcars$am=="manual",]$mpg)
+```
+Mean MPG of manaual transmission: `r round(mean_manual,2)`
+Mean MPG of automatic transmission: `r round(mean_auto,2)` 
+
+###T-test of hypothesis 
+This test shows that there is significant difference in MPG between automatic and manaul transmission.
+```{r}
+mpg_automatic= mtcars[mtcars$am=="automatic",]$mpg
+mpg_manual= mtcars[mtcars$am=="manual",]$mpg
+mpg_automatic
+mpg_manual
+t.test(mpg_automatic, mpg_manual)
+```
 
 ```{r}
 with(mtcars, tapply(mpg, am, summary))
