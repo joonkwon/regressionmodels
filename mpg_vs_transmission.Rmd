@@ -33,6 +33,38 @@ mtcars$vs = as.factor(mtcars$vs)
 mtcars$gear = as.factor(mtcars$gear)
 mtcars$carb = as.factor(mtcars$carb)
 ```
+#Eploratory Data Analysis
+
+###Summary of MPG by Transmission Type
+
+```{r}
+mpg_automatic= mtcars[mtcars$am=="automatic",]$mpg ;mpg_manual= mtcars[mtcars$am=="manual",]$mpg
+summary(mpg_automatic); summary(mpg_manual)
+
+boxplot(mpg ~ am, data=mtcars, main="Mileage by Transmission Type", ylab="MPG (Mile per Gallon)",
+        col=c("lightgreen","lightblue"), names=c("automaitc", "manual"))
+```
+
+From the boxplot, we can see cars with manual transmission have on average much higher mpg. Also, more than 75% of cars with manual transmission have higher mpg than 75% of cars with automaitc transmission. It is quite apparent. However, we will investigate how other factors such as displacement, number of cylinder and etc are influencing this.
+
+###Hypothesis
+
+We propose an hypothesis thtat MPG of manual transmission is greater than that of automatic transmission. 
+We will run a t-test to see if our data reject the null hypotheis where MPG of manual transmission is equal to that of automatic transmission.
+
+Mean MPG of manaual transmission: **`r round(mean(mpg_manual),2)`**
+
+Mean MPG of automatic transmission: **`r round(mean(mpg_automatic),2)`** 
+
+The difference of average MPG between automatic and manaul transmission: **`rround(mean(mpg_manual),2) -round(mean(mpg_automatic),2)`** 
+
+###T-test of hypothesis 
+This test shows that the difference in MPG between automatic and manaul transmission is statistically siginificant.
+
+```{r}
+t.test(mpg_automatic, mpg_manual)
+```
+###Correlation Matrix
 
 Let's check correlation of variables.
 ```{r}
@@ -53,35 +85,6 @@ We can see mpg is correlated highly with cyl, disp, hp and wt but less with am. 
 
 However, cyl, wt and disp have strong colinearity with am. This will strongly affect the adjustment of linear model between mpg and am, when other variables are considered. We will look at this later and modify our model accordingly.
 
-#Eploratory Data Analysis
-
-```{r}
-boxplot(mpg ~ am, data=mtcars, main="Mileage by Transmission Type", ylab="MPG (Mile per Gallon)",
-        col=c("lightgreen","lightblue"), names=c("automaitc", "manual"))
-```
-
-
-
-from the boxplot, we can see cars with manual transmission have on average much higher mpg. Also, more than 75% of cars with manual transmission have higher mpg than 75% of cars with automaitc transmission. It is quite apparent. However, we will investigate how other factors such as displacement, number of cylinder and etc are influencing this.
-
-##Hypothesis
-MPG of manual transmission is equal to that of automatic transmission
-```{r}
-mean_auto = mean(mtcars[mtcars$am=="automatic",]$mpg)
-mean_manual = mean(mtcars[mtcars$am=="manual",]$mpg)
-```
-Mean MPG of manaual transmission: `r round(mean_manual,2)`
-Mean MPG of automatic transmission: `r round(mean_auto,2)` 
-
-###T-test of hypothesis 
-This test shows that there is significant difference in MPG between automatic and manaul transmission.
-```{r}
-mpg_automatic= mtcars[mtcars$am=="automatic",]$mpg
-mpg_manual= mtcars[mtcars$am=="manual",]$mpg
-mpg_automatic
-mpg_manual
-t.test(mpg_automatic, mpg_manual)
-```
 
 ```{r}
 with(mtcars, tapply(mpg, am, summary))
