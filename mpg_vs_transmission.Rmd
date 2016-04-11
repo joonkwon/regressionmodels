@@ -21,28 +21,21 @@ We load data and briefly examine them.
 ```{r}
 #load mtcars data
 data(mtcars)
-str(mtcars)
-head(mtcars)
-tail(mtcars)
 ```
-It appears that some columns appear to be categorical - am, cyl, vs, carb. We will later modify the type of those columns to factor from number.
+It appears that some columns appear to be categorical - am, cyl, vs, carb. Lets' make them as factors.
 
-Let's make some columns to factor so that we can build model more easily.
 ```{r}
-mtcars.f = mtcars
-mtcars.f$am = as.factor(mtcars.f$am)
+mtcars$am = as.factor(mtcars$am)
 #chang level names to automaitc and manual
-levels(mtcars.f$am) = c("automatic", "manual")
-mtcars.f$cyl = as.factor(mtcars.f$cyl)
-mtcars.f$vs = as.factor(mtcars.f$vs)
-mtcars.f$gear = as.factor(mtcars.f$gear)
-mtcars.f$carb = as.factor(mtcars.f$carb)
+levels(mtcars$am) = c("automatic", "manual")
+mtcars$cyl = as.factor(mtcars$cyl)
+mtcars$vs = as.factor(mtcars$vs)
+mtcars$gear = as.factor(mtcars$gear)
+mtcars$carb = as.factor(mtcars$carb)
 ```
+
 Let's check correlation of variables.
 ```{r}
-#cor_matrix <- cor(mtcars)
-#cor_matrix[c(1,9),]
-
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 {
     usr <- par("usr"); on.exit(par(usr))
@@ -53,7 +46,7 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
     if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
     text(0.5, 0.5, txt, cex = cex.cor * r)
 }
-pairs(mtcars.f, lower.panel = panel.smooth, upper.panel = panel.cor,  col = 3 + (mtcars$am == 1))
+pairs(mtcars, lower.panel = panel.smooth, upper.panel = panel.cor,  col = 3 + (mtcars$am == 1))
 ```
 
 We can see mpg is correlated highly with cyl, disp, hp and wt but less with am. These correspond with our intutition that number of cylider, displacement of engine, HP and Weight will have high impact on MPG.
@@ -74,7 +67,6 @@ from the boxplot, we can see cars with manual transmission have on average much 
 ##Hypothesis
 MPG of manual transmission is equal to that of automatic transmission
 ```{r}
-mtcars <- mtcars.f
 mean_auto = mean(mtcars[mtcars$am=="automatic",]$mpg)
 mean_manual = mean(mtcars[mtcars$am=="manual",]$mpg)
 ```
