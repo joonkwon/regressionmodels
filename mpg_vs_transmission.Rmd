@@ -1,5 +1,5 @@
 ---
-title: "MPG Transmission"
+title: "Effect of Transmission Type on Gas Mileage"
 author: "Joohyun Kwon"
 date: "April 5, 2016"
 output: html_document
@@ -86,7 +86,9 @@ bestFit = stepAIC(fitAll, direction="both")
 ```
 
 ```{r}
-summary(bestFit)
+library(knitr)
+bestFit$call
+kable(summary(bestFit)$coef, digit=2)
 ```
 
 StepAIC function selects **cyl**, **hp** and **wt** along with **am** as the predictors for our linear regression model.
@@ -95,7 +97,7 @@ StepAIC function selects **cyl**, **hp** and **wt** along with **am** as the pre
 
 As the summary output shows. This regression model explains 87% of variations (R-squared) with P-value (1.506e-10) that is much lower than 0.05.
 
-The coefficient of am (ammanual = 1.18) is the increase of MPG if the transmission becomes manual from automatic while holding the other variables as is. That is the difference of MPG between manual and automatic transmission.
+The coefficient of am (ammanual = 1.81) is the increase of MPG if the transmission becomes manual from automatic while holding the other variables as is. That is the difference of MPG between manual and automatic transmission.
 
 However, the P-value (0.21) for am coefficient is much larger than the cut-value of 0.05. Thus the coefficient is statistically insignificant and we cannot reject the hypothesis that this coefficeint is zero. Thus we cannot propose that there will 1.18 mpg difference between manual and automatic transmission.
 
