@@ -10,14 +10,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 #Executive Summary
 
-We are interested in analyzing various factors that influence gas mileage (MPG - Mile Per Gallon) of a car. Particulary we will look at the influence of transmission type on gas mileage. We collected various data from 33 cars and analyzed them in order to answer below questions:
+We are interested in analyzing the influence of transmission type on gas mileage (MPG - Mile Per Gallon) of a car. We collected various data from 33 cars and analyzed them in order to answer below questions:
 
 - Is an automatic or manual transmission better for MPG
 - What is MPG difference between those two transmission types
 
-A simple t-test shows that there is significant difference in average MPG between those two groups - one with automatic transmission, the other with manua. We also build a linear regression model where it includes as many variables as possible while keeping coefficient for am variable statistically significant. We could include only am (tranmission type) and hp as predictors in this model. This model shows that there is average 5.28 MPG increase in cars with manual transmission compared with those with automatic transmission.
+A simple t-test shows that there is significant difference (7.24 mpg) in average MPG between those two groups - one with automatic transmission, the other with manual. 
 
-However, there is not enough data that could explain the exact effect of transmission type on MPG. Variables such as wt, disp and cyl should be included in the model since they have higher correlation with mpg than hp or am. But the inclusion of any of those render am coefficient insignificant. For the investigation of exact impact of transmission type on MPG, more data or other types of data should be collected. For example, some data collected from cars that has only difference in transmission would provide a good data for this investigation
+We also built a linear regression model with a stepwise selection method. In the model, am, cyl, hp and wt were selected as the predictors. This model explains 87% of variations (R-squared) with P-value 1.506e-10. The coefficient for am is 1.81, which means there is a increase of 1.81 mpg when the type of transmission is changed to manual from automatic while holding other variables the same.
+
+However, the P-value of am coefficient(0.21) is larger than 0.05, which renders the coefficient statistically insignificant. This is because am is highly correlated with wt and cyl and there is not enough data that could explain the separate effect of transmission type on MPG.
 
 In conclusion, there is high correlation between transmission type and MPG. However, with current data, we can't conclusively propose the amount of MPG difference between manaual and automatic transmission.
 
@@ -65,7 +67,7 @@ Mean MPG of automatic transmission: **`r round(mean(mpg_automatic),2)`**
 
 The difference of average MPG between automatic and manaul transmission: **`r round(mean(mpg_manual),2) -round(mean(mpg_automatic),2)`** 
 
-###T-test of hypothesis 
+###T-test
 This test shows that the difference in MPG between automatic and manaul transmission is statistically siginificant.
 
 ```{r}
@@ -77,7 +79,7 @@ t.test(mpg_automatic, mpg_manual)
 
 We use stepAIC in order to select variables for model using stepwise selection methods.
 
-```{r message=FALSE}
+```{r results="hide",message=FALSE}
 fitAll = lm(mpg ~ ., mtcars)
 library(MASS)
 bestFit = stepAIC(fitAll, direction="both")
@@ -93,12 +95,9 @@ StepAIC function selects **cyl**, **hp** and **wt** along with **am** as the pre
 
 As the summary output shows. This regression model explains 87% of variations (R-squared) with P-value (1.506e-10) that is much lower than 0.05.
 
-The coefficient of ammanual (1.81) is the increase of MPG if the transmission becomes manual from automatic while holding the other variables as is. That is the difference of MPG between manual and automatic transmission.
+The coefficient of am (ammanual = 1.18) is the increase of MPG if the transmission becomes manual from automatic while holding the other variables as is. That is the difference of MPG between manual and automatic transmission.
 
-However, the P-value (0.21) for ammanual coefficient is much larger than the cut-value of 0.05. Thus the coefficient is statistically insignificant and we cannot reject the hypothesis that this coefficeint is zero.
-
-
-
+However, the P-value (0.21) for am coefficient is much larger than the cut-value of 0.05. Thus the coefficient is statistically insignificant and we cannot reject the hypothesis that this coefficeint is zero. Thus we cannot propose that there will 1.18 mpg difference between manual and automatic transmission.
 
 
 #Review Remark
@@ -119,19 +118,30 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 pairs(mtcars, lower.panel = panel.smooth, upper.panel = panel.cor,  col = 3 + (mtcars$am == "manual"))
 ```
 
-We can see mpg is highly correlated with cyl, disp, hp and wt but less with am. Disp is also strongly correlated with hp and wt, which is probably why disp is not included in the regression model that we select through stepwise selection. Am is relatively weakly correlated (cor=0.6) with mpg and rather strongly correlated with wt and cyl, which is why, in the final model, the variance of am coefficient becomes so large that P-value gets larger than 0.5 and the coefficient gets statistically insignificant.
+We can see mpg is highly correlated with cyl, disp, hp and wt but less with am. Disp is also strongly correlated with hp and wt, which is probably why disp is not included in the regression model that we select through stepwise selection. Am is relatively weakly correlated (cor=0.6) with mpg and rather strongly correlated with wt and cyl, which is why, in the final model, the variance of am coefficient becomes large, which makes P-value over 0.05.
 
+Let's look at plot between wt and mpg, as an example - transmission typew were color-coded.
 
 ```{r}
-#par(mfrow=c(1,3))
-#with(mtcars, plot(cyl, mpg, col=3+(am=="automatic"), pch=19))
-with(mtcars, plot(hp, mpg, col=3+(am=="automatic"), pch=19))
-#with(mtcars, plot(am, wt))
 with(mtcars, plot(wt, mpg, col=3+(am=="automatic"), pch=19))
+legend("topright", col=c(3,4), legend=c("manual", "automatic"), pch=19)
 ```
 
+We can see from this plot, that most of high wt cars have automatic transmission and most of low wt have manual. So wt can mostly explain the variance in mpg, which is why the coefficient of am in our regression model is not significant.
+
+In order to explain true effects of transmission types, we will need more data - ideally, if the data include some cars with different types of transmission while weight and cylinder numbers are the same.
+
+
+However, P-value of 
+there is not enough data that could explain the exact effect of transmission type on MPG. Variables such as wt, disp and cyl should be included in the model since they have higher correlation with mpg than hp or am. But the inclusion of any of those render am coefficient insignificant. For the investigation of exact impact of transmission type on MPG, more data or other types of data should be collected. For example, some data collected from cars that has only difference in transmission would provide a good data for this investigation
+
+
 ###Residual Plots
+
+Residuals of our model seems well spread and shows no particular anomalies.
+
 ```{r}
+par(mfrow=c(2,2))
 plot(bestFit)
 ```
 
