@@ -101,10 +101,10 @@ However, the P-value (0.21) for ammanual coefficient is much larger than the cut
 
 
 
+#Review Remark
 
 ###Correlation Matrix
 
-Let's check correlation of variables.
 ```{r}
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 {
@@ -119,52 +119,20 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 pairs(mtcars, lower.panel = panel.smooth, upper.panel = panel.cor,  col = 3 + (mtcars$am == "manual"))
 ```
 
-We can see mpg is highly correlated with cyl, disp, hp and wt but less with am. These correspond with our intutition that number of cylider, displacement of engine, HP and Weight will have high impact on MPG.
-
-However, cyl, wt and disp have strong colinearity with am. This would strongly affect the adjustment of linear model between mpg and am, when other variables are considered. We will look at this later and modify our model accordingly.
-
-
+We can see mpg is highly correlated with cyl, disp, hp and wt but less with am. Disp is also strongly correlated with hp and wt, which is probably why disp is not included in the regression model that we select through stepwise selection. Am is relatively weakly correlated (cor=0.6) with mpg and rather strongly correlated with wt and cyl, which is why, in the final model, the variance of am coefficient becomes so large that P-value gets larger than 0.5 and the coefficient gets statistically insignificant.
 
 
 ```{r}
-#create a vector with mtcars's column names - "am"
-x <- names(mtcars)
-x <- x[! x == "am" & ! x == "mpg" ]
-#tt <- data.frame()
-#names(tt) <- c("formula", "coefficient", "P-Value")
-for (i in 1:length(x)) {
-    fml <- NULL; y <-NULL ; fit_temp <- NULL
-    fml <- paste("mpg ~ am + ", x[i] )
-    fit_temp <- lm(fml, data=mtcars) 
-    y <- c(fml,round(summary(fit_temp)$coefficients[2,1],2),
-           round(summary(fit_temp)$coefficients[2,4],2))
-    y <- as.character(y); print(y)
-   # tt <- rbind(tt,y)
-}
-
+#par(mfrow=c(1,3))
+#with(mtcars, plot(cyl, mpg, col=3+(am=="automatic"), pch=19))
+with(mtcars, plot(hp, mpg, col=3+(am=="automatic"), pch=19))
+#with(mtcars, plot(am, wt))
+with(mtcars, plot(wt, mpg, col=3+(am=="automatic"), pch=19))
 ```
 
+###Residual Plots
 ```{r}
-par(mfrow=c(1,3))
-with(mtcars, plot(disp, mpg, col=am))
-with(mtcars, plot(hp, mpg, col=am))
-with(mtcars, plot(wt, mpg, col=am))
-```
-Let's have a look at the coefficient of type of transmission when all the variables are taken as regressor.
-```{r}
-fitAll <- lm(mpg ~ ., data=mtcars)
-summary(fitAll)
-library(car)
-vif(fitAll)
+plot(bestFit)
 ```
 
 
-
-```{r}
-fit_cyl_carb = lm(mpg ~ . - cyl - carb, data=mtcars)
-anova(fitAll,fit_cyl_carb)
-fit_l = lm(mpg ~ am + disp + hp +drat + wt + qsec +vs +gear, data=mtcars)
-vif(fit_l)
-fit_l_g = lm(mpg ~ am + disp + hp +drat + wt + qsec +vs, data=mtcars)
-anova(fit_l, fit_l_g)
-```
